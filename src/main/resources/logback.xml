@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>.%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg %n
+			</Pattern>
+		</layout>
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>TRACE</level>
+		</filter>
+	</appender>
+	
+	<!-- 演示按时间滚动的策略 -->
+  	<appender name="dailyRollingFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>/tmp/logs/eshop.log</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+		    <!-- daily rollover -->
+			<FileNamePattern>/tmp/logs/eshop.%d{yyyy-MM-dd}.log</FileNamePattern>
+			
+			<!-- 保留 30天数据，默认无限-->
+			<maxHistory>30</maxHistory>			
+		</rollingPolicy>
+ 
+		<encoder>
+			<Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg %n</Pattern>
+		</encoder> 	    
+  	</appender>
+  	<appender name="minuteRollingFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>/tmp/logs/metrics.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+		    <!-- rollover every minute -->
+			<FileNamePattern>/tmp/logs/minute.%d{yyyy-MM-dd_HH-mm}.log</FileNamePattern>
+			<!-- 最多保留10个文件，默认是7 -->
+      		<maxIndex>10</maxIndex>
+			<!-- keep 30 minutes' worth of history -->
+			<maxHistory>30</maxHistory>			
+		</rollingPolicy>
+ 
+		<encoder>
+			<Pattern>%-4relative [%thread] %-5level %logger{35} - %msg %n</Pattern>
+		</encoder> 	    
+  	</appender>  
+  		
+	<!-- 综合时间与大小的滚动策略，先按小时滚动，小时内的文件大于10mb时再按大小滚动 -->
+	<appender name="businessLogFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>/tmp/logs/business.log</file>
+		
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>/tmp/logs/business-%d{yyyy-MM-dd_HH}.%i.zip</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		
+		<encoder>
+			<Pattern>%d{HH:mm:ss.SSS},%msg%n</Pattern>
+		</encoder>
+	</appender>
+	
+	<logger name="org.codingpedia" additivity="false">
+	    <level value="DEBUG" />
+		<appender-ref ref="dailyRollingFileAppender"/>
+		<appender-ref ref="minuteRollingFileAppender"/>
+		<appender-ref ref="consoleAppender" />
+	</logger>
+
+	<logger name="com.eshop.service" level="INFO" />
+
+	<root>
+		<level value="INFO" />
+		<appender-ref ref="consoleAppender" />
+	</root>
+</configuration>

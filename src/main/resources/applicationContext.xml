@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:lang="http://www.springframework.org/schema/lang" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:cache="http://www.springframework.org/schema/cache" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	         http://www.springframework.org/schema/beans/spring-beans.xsd
+	         http://www.springframework.org/schema/lang
+	         http://www.springframework.org/schema/lang/spring-lang.xsd      
+	         http://www.springframework.org/schema/tx   
+	         http://www.springframework.org/schema/tx/spring-tx.xsd    
+	         http://www.springframework.org/schema/aop     
+	         http://www.springframework.org/schema/aop/spring-aop.xsd    
+	         http://www.springframework.org/schema/mvc     
+	         http://www.springframework.org/schema/mvc/spring-mvc.xsd   
+	         http://www.springframework.org/schema/context     
+	         http://www.springframework.org/schema/context/spring-context.xsd
+	         http://www.springframework.org/schema/cache
+	         http://www.springframework.org/schema/cache/spring-cache.xsd
+	         http://www.springframework.org/schema/task 
+	         http://www.springframework.org/schema/task/spring-task.xsd">
+					
+	<!--(自动扫描的包名,管理所有使用注解的类)-->
+    <context:component-scan base-package="com.easycms.*"/>
+    
+    <!-- 配置  @Controller 到  Action -->
+    <mvc:annotation-driven/>
+
+    <!-- 容器默认的DefaultServletHandler处理 所有静态内容与无RequestMapping处理的URL-->
+	<mvc:default-servlet-handler />
+
+	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="false"/>
+
+	<task:annotation-driven/>
+	
+	<cache:annotation-driven/>
+    
+	<!-- spring mvc 基于注解在方法上 控制映射 配置 -->
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+	</bean>
+    
+	<!-- 定义无需Controller的url<->view直接映射 -->
+	<!--<mvc:view-controller path="/front/" view-name="index"/>
+	<mvc:view-controller path="/admin/" view-name="/admin/index"/> -->
+	
+	<!-- 对控制器返回的逻辑路径指定对应的视图 -->
+	<!-- prefix + view name + suffix = /WEB-INF/pages/login.jsp -->
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">	
+	   <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"></property>
+	   <property name="prefix" value="/WEB-INF/**"></property>
+	   <property name="suffix" value=".jsp"></property>
+	</bean>
+	
+	<!-- 将Controller抛出的异常转到特定View, 保持SiteMesh的装饰效果 -->
+	<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">  
+		<property name="exceptionMappings">  
+			<props>
+				<prop key="org.apache.shiro.authz.UnauthorizedException">error/403</prop>
+				<prop key="java.lang.Throwable">error/500</prop>
+            </props>  
+		</property>  
+    </bean>
+
+	<!-- 图片上传的配置 -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- 最大值4M -->
+		<property name="maxUploadSize" value="209715200" />
+		<property name="resolveLazily" value="true"/>
+	</bean>
+
+	<!-- 配置DataSource数据源 -->
+	<context:property-placeholder location="classpath:db.properties"/>
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"> 
+		<property name="driverClassName" value="${driver}"/>
+		<property name="url" value="${url}"/>
+		<property name="username" value="${username}"/>
+		<property name="password" value="${password}"/>
+	</bean>
+
+	<!-- ========================= MyBATIS configuration ========================= -->
+	<!-- 创建SqlSessionFactory，同时指定数据源 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<!-- 自动扫描model目录, 省掉mybatis-config.xml里的手工配置 -->
+  		<property name="typeAliasesPackage" value="com.easycms.model"/>
+  		<!-- 显式指定Mapper文件位置 -->
+  		<property name="mapperLocations" value="classpath:com/easycms/mappers/*.xml"/>
+	</bean>
+
+    <!-- 配置事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean> 
+
+    <!--创建数据映射器，数据映射器必须为接口 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="annotationClass" value="org.springframework.stereotype.Repository" />
+        <property name="basePackage" value="com.easycms.mappers"/>
+    </bean>
+    
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+	    <constructor-arg index="0" ref="sqlSessionFactory"/>
+	</bean>
+
+</beans>

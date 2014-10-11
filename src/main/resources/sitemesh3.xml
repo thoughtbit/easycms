@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemesh>
+	  <!-- front -->
+	  <mapping path="/*" decorator="/WEB-INF/front/decorators/decorator.jsp"/>
+</sitemesh>
