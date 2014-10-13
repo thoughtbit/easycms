@@ -1,4 +1,13 @@
-
+<!DOCTYPE html>
+<html>
+  <head>
+    <base href="<%=basePath%>"/>
+    <meta charset="utf-8"/>
+    <title>登录</title>
+	<meta http-equiv="keywords" content=""/>
+	<meta http-equiv="description" content=""/>
+  </head>
+  <body>
   	<div class="login-box">
   		<form action="account/add" method="post">
   			<p>
@@ -14,4 +23,6 @@
   			</p>
   		</form>
   	</div>
-
+  	<p><a href="account/pager">用户列表</a></p>
+  </body>
+</html>

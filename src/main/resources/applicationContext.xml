@@ -32,9 +32,9 @@
 	<mvc:default-servlet-handler />
 
 	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="false"/>
-
-	<task:annotation-driven/>
 	
+	<task:annotation-driven/>
+
 	<cache:annotation-driven/>
     
 	<!-- spring mvc 基于注解在方法上 控制映射 配置 -->
@@ -44,27 +44,78 @@
 		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
 	</bean>
     
+	<!-- Sspring自己的换管理器，这里定义了两个缓存位置名称 ，既注解中的value -->
+	<bean id="cacheManager" class="org.springframework.cache.support.SimpleCacheManager">
+		<property name="caches">
+			<set>
+				<bean
+					class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean"
+					p:name="default" />
+				<bean
+					class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean"
+					p:name="config" />
+				<bean
+					class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean"
+					p:name="folder" />
+				<bean
+					class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean"
+					p:name="article" />
+				<bean
+					class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean"
+					p:name="attachment" />
+			</set>
+		</property>
+	</bean>
+
 	<!-- 定义无需Controller的url<->view直接映射 -->
 	<!--<mvc:view-controller path="/front/" view-name="index"/>
 	<mvc:view-controller path="/admin/" view-name="/admin/index"/> -->
 	
 	<!-- 对控制器返回的逻辑路径指定对应的视图 -->
-	<!-- prefix + view name + suffix = /WEB-INF/pages/login.jsp -->
-	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">	
+	<!-- prefix + view name + suffix = /WEB-INF/view/login.jsp -->
+	<!--<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">	
 	   <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"></property>
-	   <property name="prefix" value="/WEB-INF/**"></property>
+	   <property name="prefix" value="/WEB-INF/"></property>
 	   <property name="suffix" value=".jsp"></property>
-	</bean>
+	</bean>-->
 	
-	<!-- 将Controller抛出的异常转到特定View, 保持SiteMesh的装饰效果 -->
-	<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">  
-		<property name="exceptionMappings">  
+	<!-- FreeMarker的配置 -->
+	<bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+		<property name="templateLoaderPath" value="/WEB-INF/" /><!-- 指定路径 -->
+		<property name="defaultEncoding" value="UTF-8" /><!-- 指定编码格式 -->
+		<!--<property name="freemarkerVariables">
+			<map>
+				<entry key="easycms_folder_list" value-ref="folderListTag" />
+			</map>
+		</property>-->
+		<property name="freemarkerSettings">
 			<props>
-				<prop key="org.apache.shiro.authz.UnauthorizedException">error/403</prop>
-				<prop key="java.lang.Throwable">error/500</prop>
-            </props>  
-		</property>  
-    </bean>
+				<prop key="template_update_delay">10</prop>
+				<prop key="defaultEncoding">UTF-8</prop>
+				<prop key="url_escaping_charset">UTF-8</prop>
+				<prop key="locale">zh_CN</prop>
+				<prop key="boolean_format">true,false</prop>
+				<prop key="time_format">HH:mm:ss</prop>
+				<prop key="datetime_format">yyyy-MM-dd HH:mm:ss</prop>
+				<prop key="date_format">yyyy-MM-dd</prop>
+				<prop key="number_format">#.##</prop>
+				<prop key="whitespace_stripping">true</prop>
+			</props>
+		</property>
+	</bean>
+
+    <!-- FreeMarker视图解析器 -->
+	<bean id="freeMarkerViewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+		<property name="viewClass"
+			value="org.springframework.web.servlet.view.freemarker.FreeMarkerView"></property>
+		<property name="cache" value="false" />
+		<property name="prefix" value="/" />
+		<property name="suffix" value=".ftl" /><!--可为空,方便实现自已的依据扩展名来选择视图解释类的逻辑 -->
+		<property name="contentType" value="text/html;charset=utf-8" />
+		<property name="exposeRequestAttributes" value="true" />
+		<property name="exposeSessionAttributes" value="true" />
+		<property name="exposeSpringMacroHelpers" value="true" />
+	</bean>
 
 	<!-- 图片上传的配置 -->
 	<bean id="multipartResolver"
@@ -77,10 +128,10 @@
 	<!-- 配置DataSource数据源 -->
 	<context:property-placeholder location="classpath:db.properties"/>
 	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"> 
-		<property name="driverClassName" value="${driver}"/>
-		<property name="url" value="${url}"/>
-		<property name="username" value="${username}"/>
-		<property name="password" value="${password}"/>
+		<property name="driverClassName" value="${jdbc.driverClass}"/>
+		<property name="url" value="${jdbc.url}"/>
+		<property name="username" value="${jdbc.username}"/>
+		<property name="password" value="${jdbc.password}"/>
 	</bean>
 
 	<!-- ========================= MyBATIS configuration ========================= -->

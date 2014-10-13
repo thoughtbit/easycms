@@ -1,5 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <sitemesh>
-	  <!-- front -->
-	  <mapping path="/*" decorator="/WEB-INF/front/decorators/decorator.jsp"/>
+    <!-- front -->
+    <mapping path="/front/*" decorator="/WEB-INF/decorators/front/decorator.ftl"/>
+    <!-- admin -->
+    <mapping path="/admin/*" decorator="/WEB-INF/decorators/admin/decorator.ftl"/>
 </sitemesh>

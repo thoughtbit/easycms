@@ -9,12 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.easycms.mappers.AccountMapper;
 import com.easycms.model.Account;
 import com.easycms.service.AccountService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations="classpath*:applicationContext.xml")
+@ContextConfiguration(locations = {"classpath*:applicationContext.xml"})
 public class AccountServiceImplTest{
 
 /*	@Resource(name="accountServiceImpl")
@@ -22,9 +21,6 @@ public class AccountServiceImplTest{
 	
 	@Autowired
 	private AccountService accountService;
-	
-	@Autowired
-	private AccountMapper accountMapper;
 	
 	@Test
 	public void testFindAllStudents() {
@@ -35,15 +31,15 @@ public class AccountServiceImplTest{
 		}
 	}
 
-/*	@Test
+	@Test
 	public void testFindStudentById() {
 		Account account = accountService.findAccountById(1);
 		System.err.println(account);
 		System.err.println(account.getUsername()+":"+account.getUsername());
-	}*/
+	}
 
 	
-	/*@Test
+	@Test
 	public void testCreateStudent() {
 		Account account = new Account();
 		account.setUsername("moocss@126.com");
@@ -55,6 +51,6 @@ public class AccountServiceImplTest{
 	public void testDeleteStudent() {
 		int deleted = accountService.deleteStudent(3);
 		System.err.println("deleteStudent:"+deleted);
-	}*/
+	}
 
 }

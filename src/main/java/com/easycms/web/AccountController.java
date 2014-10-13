@@ -30,6 +30,6 @@ public class AccountController{
 		accountService.createAccount(acc);
 		logger.info("{}", acc);
 		req.setAttribute("name", req.getParameter("username"));
-		return "front/login";	
+		return "front/login";
 	}
 }
