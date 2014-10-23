@@ -1,9 +1,11 @@
 ## 安装
 
 	# 下载代码
-	https://github.com/thoughtbit/easycms.git
+	https://coding.net/moocss/easycms.git
 	# 进入easycms目录
 	cd easycms
+	# MyBatis Generator
+	mvn mybatis-generator:generate
 	# 清理
 	mvn clean
 	# 编译
@@ -11,7 +13,7 @@
 	# 修改数据库配置文件
 		1、 把 src/main/resources/db.properties 拷贝到 CMS目录下
 		2、 修改db.properties里的超级管理员的email，和数据库连接的相关信息
-	# 安装
+	# 安装数据库
 	mvn exec:java -Dexec.mainClass="com.easycms.Install"
 	# 运行
 	mvn jetty:run

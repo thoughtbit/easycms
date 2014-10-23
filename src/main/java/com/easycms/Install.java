@@ -78,10 +78,11 @@ public class Install {
 					new FileInputStream(CMS_PROPERTIES));
 			Properties props = new Properties();
 			props.load(bis);
-			String url = props.getProperty("jdbc.url");
-			String driver = props.getProperty("jdbc.driverClass");
-			String username = props.getProperty("jdbc.username");
-			String password = props.getProperty("jdbc.password");
+			String url = props.getProperty("mysql.jdbc.url");
+			String driver = props.getProperty("mysql.jdbc.driverClassName");
+			String username = props.getProperty("mysql.jdbc.username");
+			String password = props.getProperty("mysql.jdbc.password");
+			
 			Class.forName(driver).newInstance();
 			conn = (Connection) DriverManager.getConnection(url, username,
 					password);

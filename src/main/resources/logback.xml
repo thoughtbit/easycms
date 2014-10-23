@@ -12,10 +12,10 @@
 	
 	<!-- 演示按时间滚动的策略 -->
   	<appender name="dailyRollingFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<File>/tmp/logs/eshop.log</File>
+		<File>/tmp/logs/easycms.log</File>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 		    <!-- daily rollover -->
-			<FileNamePattern>/tmp/logs/eshop.%d{yyyy-MM-dd}.log</FileNamePattern>
+			<FileNamePattern>/tmp/logs/easycms.%d{yyyy-MM-dd}.log</FileNamePattern>
 			
 			<!-- 保留 30天数据，默认无限-->
 			<maxHistory>30</maxHistory>			
@@ -64,7 +64,7 @@
 		<appender-ref ref="consoleAppender" />
 	</logger>
 
-	<logger name="com.eshop.service" level="INFO" />
+	<logger name="com.easycms.service" level="INFO" />
 
 	<root>
 		<level value="INFO" />

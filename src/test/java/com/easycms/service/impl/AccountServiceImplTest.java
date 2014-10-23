@@ -1,24 +1,30 @@
 package com.easycms.service.impl;
 
 import static org.junit.Assert.*;
-
 import java.util.List;
+import javax.annotation.Resource;
+import javax.sql.DataSource;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
+import org.springframework.test.context.transaction.TransactionConfiguration;
+import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.easycms.model.Account;
 import com.easycms.service.AccountService;
 
+@Transactional
+@TransactionConfiguration(defaultRollback = true)
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath*:applicationContext.xml"})
-public class AccountServiceImplTest{
+public class AccountServiceImplTest extends AbstractTransactionalJUnit4SpringContextTests{
+ 
+  	private static Logger logger = LoggerFactory.getLogger(AccountServiceImplTest.class);
 
-/*	@Resource(name="accountServiceImpl")
-	private AccountService accountService;*/
-	
 	@Autowired
 	private AccountService accountService;
 	
@@ -49,7 +55,7 @@ public class AccountServiceImplTest{
 
 	@Test
 	public void testDeleteStudent() {
-		int deleted = accountService.deleteStudent(3);
+		int deleted = accountService.deleteAccount(3);
 		System.err.println("deleteStudent:"+deleted);
 	}
 

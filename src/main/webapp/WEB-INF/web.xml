@@ -26,7 +26,11 @@
 	<!-- 配置Jersey中央控制器 -->
 	<servlet>
 		<servlet-name>jersey-serlvet</servlet-name>
-		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>	
+		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+	    <init-param>
+	      	<param-name>javax.ws.rs.Application</param-name>
+	      	<param-value>com.easycms.api.MyApplication</param-value>
+	    </init-param>
 		<load-on-startup>2</load-on-startup>
 	</servlet>
  	<!-- jersey 中央控制器的映射 -->

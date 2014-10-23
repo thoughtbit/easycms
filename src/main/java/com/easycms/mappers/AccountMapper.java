@@ -21,6 +21,9 @@ public interface AccountMapper{
 	@Insert("insert into Account(username,password) values(#{username},#{password})")
 	void createAccount(Account account);
 	
+	@Update("update Account set username=#{username}, password=#{password} where id=#{id}")
+	void updateAccount(Account account);
+	
 	@Select("select * from Account where id=#{id}")
 	Account findAccountById(int id);
 	

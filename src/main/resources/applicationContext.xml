@@ -21,16 +21,21 @@
 	         http://www.springframework.org/schema/cache/spring-cache.xsd
 	         http://www.springframework.org/schema/task 
 	         http://www.springframework.org/schema/task/spring-task.xsd">
-					
-	<!--(自动扫描的包名,管理所有使用注解的类)-->
-    <context:component-scan base-package="com.easycms.*"/>
+		
+
+	<!-- 自动扫描@Component , @Service , @Repository,@Controller等标注的类 不搜索@Controller的类 -->
+	<context:component-scan base-package="com.easycms.*"/>
     
+	<!-- 属性和配置文件读入 ,多个用逗号隔开 -->
+	<context:property-placeholder location="classpath:db.properties"/>
+
     <!-- 配置  @Controller 到  Action -->
     <mvc:annotation-driven/>
 
     <!-- 容器默认的DefaultServletHandler处理 所有静态内容与无RequestMapping处理的URL-->
 	<mvc:default-servlet-handler />
 
+	<!-- 连接事务的注解配置 -->
 	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="false"/>
 	
 	<task:annotation-driven/>
@@ -43,8 +48,8 @@
 	<bean
 		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
 	</bean>
-    
-	<!-- Sspring自己的换管理器，这里定义了两个缓存位置名称 ，既注解中的value -->
+
+	<!-- Spring自己的换管理器，这里定义了两个缓存位置名称 ，既注解中的value -->
 	<bean id="cacheManager" class="org.springframework.cache.support.SimpleCacheManager">
 		<property name="caches">
 			<set>
@@ -54,7 +59,7 @@
 				<bean
 					class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean"
 					p:name="config" />
-				<bean
+<!-- 				<bean
 					class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean"
 					p:name="folder" />
 				<bean
@@ -62,7 +67,7 @@
 					p:name="article" />
 				<bean
 					class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean"
-					p:name="attachment" />
+					p:name="attachment" /> -->
 			</set>
 		</property>
 	</bean>
@@ -125,27 +130,59 @@
 		<property name="resolveLazily" value="true"/>
 	</bean>
 
+	<!-- C3P0数据库配置 -->
+	<bean id="c3p0" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="acquireIncrement" value="${c3p0.acquireIncrement}" />
+		<property name="acquireRetryAttempts" value="${c3p0.acquireRetryAttempts}" />
+		<property name="acquireRetryDelay" value="${c3p0.acquireRetryDelay}" />
+		<property name="autoCommitOnClose" value="${c3p0.autoCommitOnClose}" />
+		<property name="automaticTestTable" value="${c3p0.automaticTestTable}" />
+		<property name="breakAfterAcquireFailure" value="${c3p0.breakAfterAcquireFailure}" />
+		<property name="checkoutTimeout" value="${c3p0.checkoutTimeout}" />
+		<property name="idleConnectionTestPeriod" value="${c3p0.idleConnectionTestPeriod}" />
+		<property name="initialPoolSize" value="${c3p0.initialPoolSize}" />
+		<property name="minPoolSize" value="${c3p0.minPoolSize}" />
+		<property name="maxPoolSize" value="${c3p0.maxPoolSize}" />
+		<property name="maxIdleTime" value="${c3p0.maxIdleTime}" />
+		<property name="maxStatements" value="${c3p0.maxStatements}" />
+		<property name="maxStatementsPerConnection" value="${c3p0.maxStatementsPerConnection}" />
+		<property name="numHelperThreads" value="${c3p0.numHelperThreads}" />
+		<property name="testConnectionOnCheckout" value="${c3p0.testConnectionOnCheckout}" />
+	</bean>
+
 	<!-- 配置DataSource数据源 -->
-	<context:property-placeholder location="classpath:db.properties"/>
-	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"> 
+	<!--<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"> 
 		<property name="driverClassName" value="${jdbc.driverClass}"/>
 		<property name="url" value="${jdbc.url}"/>
 		<property name="username" value="${jdbc.username}"/>
 		<property name="password" value="${jdbc.password}"/>
+	</bean>-->
+	<!-- 配置MySql DataSource数据源  id=mysqlDataSource -->
+	<bean id="dataSource" parent="c3p0">
+		<property name="driverClass" value="${mysql.jdbc.driverClassName}" />
+		<property name="jdbcUrl" value="${mysql.jdbc.url}" />
+		<property name="user" value="${mysql.jdbc.username}" />
+		<property name="password" value="${mysql.jdbc.password}" />
 	</bean>
 
 	<!-- ========================= MyBATIS configuration ========================= -->
 	<!-- 创建SqlSessionFactory，同时指定数据源 -->
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!-- ref="mysqlDataSource" -->
 		<property name="dataSource" ref="dataSource"/>
 		<!-- 自动扫描model目录, 省掉mybatis-config.xml里的手工配置 -->
   		<property name="typeAliasesPackage" value="com.easycms.model"/>
-  		<!-- 显式指定Mapper文件位置 -->
+		<!-- 
+		第一是手动在 MyBatis 的 XML 配置文件中使用<mappers>部分来指定类路径。
+		第二是使用工厂 bean 的 mapperLocations属性
+		<property name="configLocation" value="classpath:config/MyBatisConfig.xml" />
+		 -->
   		<property name="mapperLocations" value="classpath:com/easycms/mappers/*.xml"/>
 	</bean>
 
-    <!-- 配置事务管理器 -->
+    <!-- 数据连接事务 -->
 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<!-- ref="mysqlDataSource" -->
         <property name="dataSource" ref="dataSource"/>
     </bean> 
 
@@ -158,5 +195,19 @@
 	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
 	    <constructor-arg index="0" ref="sqlSessionFactory"/>
 	</bean>
+
+
+	<!--开发期间注释掉，上线后启用 错误解析器 发生错误默认会跳转到/web-inf/views/timeout.jsp -->
+	<!-- <bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="defaultErrorView" value="timeout" />
+		<property name="exceptionMappings">
+			<props>
+				<prop key="java.sql.SQLException">timeout</prop>
+				<prop key="java.lang.RuntimeException">timeout</prop>
+				<prop key="org.springframework.transaction.TransactionException">timeout</prop>
+				<prop key="org.springframework.dao.DataAccessException">timeout</prop>
+			</props>
+		</property>
+	</bean> -->
 
 </beans>

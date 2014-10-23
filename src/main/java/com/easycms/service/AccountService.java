@@ -10,13 +10,15 @@ import com.easycms.model.Account;
  */
 public interface AccountService{
 
-	public void createAccount(Account account);
+	void createAccount(Account account);
 	
-	public int deleteStudent(int id);
+	int deleteAccount(int id);
 	
-	public Account findAccountById(int id);
+	Account updateAccount(Account account);
 	
-	public List<Account> findAccountAll();
+	Account findAccountById(int id);
 	
-	public int findTotal();
+	List<Account> findAccountAll();
+	
+	int findTotal();
 }

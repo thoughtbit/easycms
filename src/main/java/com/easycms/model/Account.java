@@ -2,11 +2,22 @@ package com.easycms.model;
 
 import java.io.Serializable;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 @SuppressWarnings("serial")
+@XmlRootElement
 public class Account implements Serializable{
 	private int id;
 	private String username;
 	private String password;
+	
+	public Account(){}
+	
+	public Account(String username,String password){
+		this.username = username;
+		this.password = password;
+	}
+	
 	public int getId() {
 		return id;
 	}
